@@ -1,0 +1,17 @@
+.gitattributes eol=lf
+.gitignore     eol=lf
+
+*.c      eol=lf
+*.cpp    eol=lf
+*.h      eol=lf
+*.hpp    eol=lf
+*.lua    eol=lf
+*.m      eol=lf
+*.md     eol=lf
+*.mk     eol=lf
+*.mm     eol=lf
+*.sc     eol=lf
+*.sh     eol=lf
+*.txt    eol=lf
+
+makefile eol=lf

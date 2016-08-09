@@ -1,0 +1,23 @@
+# OS X
+.DS_Store
+
+# Make
+Makefile
+*.make
+
+# Sublime
+*.sublime*
+
+# Xcode
+xcuserdata
+*.xcodeproj
+*.xcworkspace
+
+# Visual Studio
+.vs/
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.*
