@@ -1,4 +1,5 @@
 #pragma once
+#include <ciso646>
 #include <stddef.h>
 #include <initializer_list>
 #include <iosfwd>
@@ -171,7 +172,6 @@ public: // serialization
     std::string write(const format& = format::indented()) const;
 
 public: // copyable
-    explicit
     json(const json&);
     json& operator=(const json&);
 

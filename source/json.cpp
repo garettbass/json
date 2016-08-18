@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -8,14 +9,11 @@
 #include <json/json.h>
 
 
-#undef NULL
-#define NULL json::NULLJSON
-
-
 #if defined(__GNUC__)
     #define forceinline __attribute__((always_inline)) inline
 #elif defined(_MSC_VER)
     #define forceinline __forceinline
+    #define strcasecmp _stricmp
 #endif
 
 
@@ -83,12 +81,12 @@ template <typename T>
 void destruct(T& t) { t.~T(); }
 
 json::json()
-: _type(NULL) {
+: _type(NULLJSON) {
     construct(_number, 0.0);
 }
 
 json::json(null)
-: _type(NULL) {
+: _type(NULLJSON) {
     construct(_number, 0.0);
 }
 
@@ -113,7 +111,7 @@ json::json(string value)
 }
 
 json::json(const char* value)
-: _type(value ? STRING : NULL) {
+: _type(value ? STRING : NULLJSON) {
     if (value) {
         construct(_string, value);
     } else {
@@ -144,7 +142,7 @@ json::~json() {
         } break;
         default: break;
     }
-    _type = NULL;
+    _type = NULLJSON;
 }
 
 // json copy -------------------------------------------------------------------
@@ -152,7 +150,7 @@ json::~json() {
 json::json(const json& src)
 : _type(src._type) {
     switch (src._type) {
-        case NULL: {
+        case NULLJSON: {
             construct(_number, 0.0);
             break;
         }
@@ -187,7 +185,7 @@ json::operator=(const json& src) {
 json::json(json&& src)
 : _type(src._type) {
     switch (src._type) {
-        case NULL: {
+        case NULLJSON: {
             construct(_number, 0.0);
             break;
         }
@@ -268,7 +266,7 @@ json::operator==(const json& b) const {
         return false;
 
     switch (_type) {
-        case NULL: {
+        case NULLJSON: {
             return true;
         }
         case BOOLEAN:
@@ -307,6 +305,7 @@ json::operator==(const json& b) const {
             return true;
         }
     }
+    return false;
 }
 
 bool
@@ -581,7 +580,7 @@ json::descendant(const string& path) {
 void
 json::clear() {
     switch(_type) {
-        case NULL:
+        case NULLJSON:
         case BOOLEAN:
         case NUMBER: {
             _number = 0.0;
@@ -1213,8 +1212,8 @@ struct json_parser {
 
     json parse() {
         if (src.empty()) return json::null();
-        ccitr itr = &*src.begin();
-        ccend end = &*src.end();
+        ccitr itr = src.c_str();
+        ccend end = itr + src.size();
         json root;
         if (parse_value(root, itr, end)) {
             return root;
@@ -1431,15 +1430,10 @@ struct json_parser {
 
     // JSON parsing utilities ----------------------------------------------
 
-    forceinline
-    static int is_digit(const int c) {
-        enum:int{D0='0',D9='9'};
-        return (c>=D0 & c<=D9);
-    }
 
     forceinline
     static bool has_digit(ccitr itr, ccend end) {
-        return (itr < end) and is_digit(itr[0]);
+        return (itr < end) and isdigit(itr[0]);
     }
 
     forceinline
@@ -1450,7 +1444,7 @@ struct json_parser {
     forceinline
     static int is_hex(const int c) {
         enum:int{D0='0',D9='9',A='A',F='F',a='a',f='f'};
-        return (c>=D0 & c<=D9)|(c>=A & c<=F)|(c>=a & c<=f);
+        return ((c>=D0) & (c<=D9))|((c>=A) & (c<=F))|((c>=a) & (c<=f));
     }
 
     forceinline
@@ -1472,7 +1466,7 @@ struct json_parser {
     forceinline
     static int is_literal_end_char(const int c) {
         enum:int{SP=' ',HT='\t',LF='\n',CR='\r',CM=',',RB=']',RC='}'};
-        return (c==SP|c==HT|c==LF|c==CR|c==CM|c==RB|c==RC);
+        return ((c==SP)|(c==HT)|(c==LF)|(c==CR)|(c==CM)|(c==RB)|(c==RC));
     }
 
     forceinline
@@ -1503,13 +1497,13 @@ json
 json::read(std::istream& in) {
     if (in.good()) {
         in.seekg(0, in.end);
-        const auto size = in.tellg();
+        const size_t size = in.tellg();
         in.seekg(0, in.beg);
         std::string src(size, '\0');
         in.read(&src.front(), size);
         return read(src);
     }
-    return NULL;
+    return NULLJSON;
 }
 
 
@@ -1674,7 +1668,7 @@ void write_json(
     const int          depth
 ) {
     switch (root.type()) {
-        case json::NULL: {
+        case json::NULLJSON: {
             s << "null";
         } break;
         case json::BOOLEAN: {
