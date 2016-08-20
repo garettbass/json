@@ -57,6 +57,8 @@ public: // structors
 
 public: // operators
 
+    explicit operator bool() const { return any(); }
+
     T& operator[] (size_t index) const {
         assert(head);
         assert(head + index < tail);
@@ -64,6 +66,8 @@ public: // operators
     }
 
 public: // properties
+
+    bool any() const { return head < tail; }
 
     bool empty() const { return head == tail; }
 
@@ -171,7 +175,6 @@ public: // serialization
     std::string write(const format& = format::indented()) const;
 
 public: // copyable
-    explicit
     json(const json&);
     json& operator=(const json&);
 
