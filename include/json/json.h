@@ -58,6 +58,8 @@ public: // structors
 
 public: // operators
 
+    explicit operator bool() const { return any(); }
+
     T& operator[] (size_t index) const {
         assert(head);
         assert(head + index < tail);
@@ -66,18 +68,20 @@ public: // operators
 
 public: // properties
 
+    bool any() const { return head < tail; }
+
     bool empty() const { return head == tail; }
 
+    size_t  count() const { return std::distance(head, tail); }
     size_t length() const { return std::distance(head, tail); }
-
-    size_t size() const { return std::distance(head, tail); }
+    size_t   size() const { return std::distance(head, tail); }
 
 public: // accessors
 
     T* data() const { return head; }
 
     T& front() const { assert(not empty()); return head[ 0]; }
-    T& back()  const { assert(not empty()); return tail[-1]; }
+    T&  back() const { assert(not empty()); return tail[-1]; }
 
 public: // iterators
 

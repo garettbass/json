@@ -400,25 +400,25 @@ json::operator [](const string& name) {
 }
 
 json::boolean
-operator or(const json& j, const json::boolean fallback) {
+operator or(const json& j, json::boolean fallback) {
     if (j.type() == json::BOOLEAN) return json::boolean(j);
     return fallback;
 }
 
 json::number
-operator or(const json& j, const json::number fallback) {
+operator or(const json& j, json::number fallback) {
     if (j.type() == json::NUMBER) return json::number(j);
     return fallback;
 }
 
 json::integer
-operator or(const json& j, const json::integer fallback) {
+operator or(const json& j, json::integer fallback) {
     if (j.type() == json::NUMBER) return json::integer(j);
     return fallback;
 }
 
 json::string
-operator or(const json& j, const json::string fallback) {
+operator or(const json& j, json::string fallback) {
     if (j.type() == json::STRING) return json::string(j);
     return fallback;
 }
