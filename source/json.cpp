@@ -439,7 +439,10 @@ json::type() const { return _type; }
 json::iterators<const json::element>
 json::elements() const {
     if (_type == ARRAY) {
-        return { &*_array.begin(), &*_array.end() };
+        const size_t size = _array.size();
+        const json::element* itr = size ? &_array[0] : nullptr;
+        const json::element* end = itr + size;
+        return { itr, end };
     }
     return {};
 }
@@ -447,7 +450,10 @@ json::elements() const {
 json::iterators<json::element>
 json::elements() {
     if (_type == ARRAY) {
-        return { &*_array.begin(), &*_array.end() };
+        const size_t size = _array.size();
+        json::element* itr = size ? &_array[0] : nullptr;
+        json::element* end = itr + size;
+        return { itr, end };
     }
     return {};
 }
@@ -455,7 +461,10 @@ json::elements() {
 json::iterators<const json::property>
 json::properties() const {
     if (_type == OBJECT) {
-        return { &*_object.begin(), &*_object.end() };
+        const size_t size = _object.size();
+        const json::property* itr = size ? &_object[0] : nullptr;
+        const json::property* end = itr + size;
+        return { itr, end };
     }
     return {};
 }
@@ -463,7 +472,10 @@ json::properties() const {
 json::iterators<json::property>
 json::properties() {
     if (_type == OBJECT) {
-        return { &*_object.begin(), &*_object.end() };
+        const size_t size = _object.size();
+        json::property* itr = size ? &_object[0] : nullptr;
+        json::property* end = itr + size;
+        return { itr, end };
     }
     return {};
 }
@@ -473,10 +485,11 @@ json::properties() {
 static
 int
 toindex(const std::string& name) {
-    const char* itr = &*name.begin();
+    const char* itr = &name[0];
     char* end = nullptr;
     const int index(strtol(itr, &end, 10));
-    if (size_t(end) == size_t(&*name.end())) {
+    const size_t len = std::distance<const char*>(itr, end);
+    if (len == name.size()) {
         // entire name was converted to index
         return index >= 0 ? index : -1;
     }
@@ -1364,8 +1377,8 @@ struct json_parser {
             itr += 6;
         }
         utf8_codepoint utf8;
-        const char16_t*       utf16_itr = &*utf16_buffer.begin();
-        const char16_t* const utf16_end = &*utf16_buffer.end();
+        const char16_t*       utf16_itr = &utf16_buffer[0];
+        const char16_t* const utf16_end = utf16_itr + utf16_buffer.size();
         while (utf16_itr < utf16_end) {
             if (not utf8(utf16_itr))
                 return false;
